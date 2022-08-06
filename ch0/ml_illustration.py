@@ -21,9 +21,15 @@ class MlExample:
     self.y = np.sin(self.x)
     self.pred = None  # prediction 
     self.L = None  # loss
+    self.model = None
+    self.model_label = None
+    self.alpha = None
+    self.iter = None
 
   
   def train_model1(self, learning_rate, iteration):
+    self.alpha = learning_rate
+    self.iter = iteration 
     # weights
     a = np.random.randn()
     b = np.random.randn()
@@ -55,12 +61,16 @@ class MlExample:
     end = time.time()
     es = round(end-start, 3)
     print(f"The training time is: {es} seconds")
-    print(f'Result: y = {a} + {b} x + {c} x^2 + {d} x^3')
+    self.model = f'Result: y = {a} + {b} x + {c} x^2 + {d} x^3'
+    print(self.model)
+    self.model_label = r"$y = a+bx+cx^2+dx^3$"
     self.pred = y_pred
     self.L = L
     return y_pred, L 
 
   def train_model2(self, learning_rate, iteration):
+    self.alpha = learning_rate
+    self.iter = iteration 
     # weights
     a = np.random.randn()
     b = np.random.randn()
@@ -95,12 +105,16 @@ class MlExample:
     end = time.time()
     es = round(end-start, 3)
     print(f"The training time is: {es} seconds")
-    print(f'Result: y = {a} + {b} x + {c} x^2 + {d} x^3 + {e} x^4')
+    self.model = f'Result: y = {a} + {b} x + {c} x^2 + {d} x^3 + {e} x^4'
+    print(self.model)
+    self.model_label = r"$y = a+bx+cx^2+dx^3+ex^4$"
     self.pred = y_pred
     self.L = L 
     return y_pred, L 
 
   def train_model3(self, learning_rate, iteration):
+    self.alpha = learning_rate
+    self.iter = iteration 
     # weights
     a = np.random.randn()
     b = np.random.randn()
@@ -138,7 +152,9 @@ class MlExample:
     end = time.time()
     es = round(end-start, 3)
     print(f"The training time is: {es} seconds")
-    print(f'Result: y = {a} + {b} x + {c} x^2 + {d} x^3 + {e} x^4 + {f} x^5')
+    self.model = f'Result: y = {a} + {b} x + {c} x^2 + {d} x^3 + {e} x^4 + {f} x^5'
+    print(self.model)
+    self.model_label = r"$y = a+bx+cx^2+dx^3+ex^4+fx^5$"
     self.pred = y_pred
     self.L = L
     return y_pred, L 
@@ -146,10 +162,10 @@ class MlExample:
   def plot_results(self):
       fig, ax = plt.subplots(1, 2, figsize=(14, 5))
       ax[0].plot(self.L)
-      ax[0].set_title("The loss function")
+      ax[0].set_title(f"The loss function with alpha {self.alpha} and Iter {self.iter}")
       ax[0].annotate(round(self.L[-1], 3), (len(self.L)-5, self.L[-1]))
       ax[1].plot(self.x, self.y, label=r"$\sin(x)$")
-      ax[1].plot(self.x, self.pred, label=r"$y = a+bx+cx^2+dx^3+ex^4$")
+      ax[1].plot(self.x, self.pred, label=self.model_label)
       ax[1].axhline(y=0, color='k')
       ax[1].legend()
       fig.show()
