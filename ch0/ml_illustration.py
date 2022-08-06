@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-class DeepIllustration:
+class MlExample:
   """
   A class to illustrate
     - what the learning rate is
@@ -107,7 +107,7 @@ class DeepIllustration:
         # compute and print loss
         loss = np.square(y - y_pred).sum()
         if t % 100 == 99:
-        L.append(loss)
+          L.append(loss)
 
         grad_y_pred = 2.0 * (y_pred - y)
         grad_a = grad_y_pred.sum()
@@ -141,8 +141,4 @@ class DeepIllustration:
         ax[1].legend()
         fig.show()
 
-
-
-
-if __name__ == "__main__":
     
