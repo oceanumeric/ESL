@@ -13,7 +13,9 @@ class OverviewSL:
     Overview of supervised learning:
         - two approaches: linear regression vs. nearest neighbors 
     """
-
+    # set seed
+    random.seed(666)
+    np.random.seed(667)
     # generate data as class variables
     size = 100
     cov = np.identity(2)
@@ -58,7 +60,6 @@ class OverviewSL:
         X = np.c_[np.ones((self.X.shape[0], 1)), self.X]
         self.weights = np.linalg.inv(X.T @ X) @ X.T @ self.Y
         self.pred = np.dot(X, self.weights)
-        print("hello michael")
         print(f"The estimated coefficents are {self.weights}")
 
     def plot_linear_model(self):
@@ -79,15 +80,57 @@ class OverviewSL:
         orange_grid = np.array([*filter(is_orange, grid)])
         blue_grid = np.array([*filterfalse(is_orange, grid)])
         axes.plot(orange_grid[:, 0], orange_grid[:, 1], '.',
-                  zorder = 0.001, color='orange', alpha = 0.3,
+                  zorder = 0.001, color='#d68904', alpha = 0.3,
                   scalex = False, scaley = False)
         axes.plot(blue_grid[:, 0], blue_grid[:, 1], '.',
-                  zorder = 0.001, color='blue', alpha = 0.3,
+                  zorder = 0.001, color='#1f6f9c', alpha = 0.3,
                   scalex = False, scaley = False)
         # a + x1*alpha + x2*beta = Y (1/0)
         find_y = lambda x: (0.5 - self.weights[0] - x* self.weights[1]) / self.weights[2]
         axes.plot(xlim, [*map(find_y, xlim)], color='k', 
                   scalex = False, scaley = False)
+        
+    def fit_with_nearest_neighbors(self, k):
+        '''
+        calculate the mean based on the distance 
+        There is NO weights 
+        '''
+        self.k = k 
+        def __predict(x):
+            # calcualte the distance 
+            distance = ((self.X - x)**2).sum(axis=1)
+            # elements within the distance, sort and find top K
+            elems = distance.argpartition(self.k)[:self.k]
+            y_pred = self.Y[elems]
+            return np.mean(y_pred)  
+        
+        # majority votes (mean > 0.5)
+        is_orange = lambda x: __predict(x) > 0.5
+        
+        # plot the classification 
+        fig, axes = plt.subplots(1, 1, figsize=(8, 8))
+        axes.scatter(self.orange[:, 0], self.orange[:, 1],
+                        color='#d68904', facecolor='none', s=70)
+        axes.scatter(self.blue[:, 0], self.blue[:, 1],
+                        color='#1f6f9c', facecolor='none', s=70)
+        xlim = axes.get_xlim()
+        ylim = axes.get_ylim()
+        grid = np.array([*product(np.linspace(*xlim, 50),
+                                  np.linspace(*ylim, 50))])
+        orange_grid = np.array([*filter(is_orange, grid)])
+        blue_grid = np.array([*filterfalse(is_orange, grid)])
+        axes.plot(orange_grid[:, 0], orange_grid[:, 1], '.',
+                  zorder = 0.001, color='#d68904', alpha = 0.3,
+                  scalex = False, scaley = False)
+        axes.plot(blue_grid[:, 0], blue_grid[:, 1], '.',
+                  zorder = 0.001, color='#1f6f9c', alpha = 0.3,
+                  scalex = False, scaley = False)
+        # plot the boundary
+        blue_sort = blue_grid[np.argsort(-blue_grid[:, 1])]
+        _, idx = np.unique(blue_sort[:, 0], return_index=True)
+        boundary = blue_sort[idx]
+        axes.plot(boundary[:, 0], boundary[:, 1], 'k-')
+        
 
 
 
