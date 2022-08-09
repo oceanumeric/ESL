@@ -89,8 +89,9 @@ class OverviewSL:
         find_y = lambda x: (0.5 - self.weights[0] - x* self.weights[1]) / self.weights[2]
         axes.plot(xlim, [*map(find_y, xlim)], color='k', 
                   scalex = False, scaley = False)
+        axes.set_title("Linear Regression of 0/1 Response")
         
-    def fit_with_nearest_neighbors(self, k):
+    def fit_with_nearest_neighbors(self, k, boundary_line=False):
         '''
         calculate the mean based on the distance 
         There is NO weights 
@@ -126,10 +127,12 @@ class OverviewSL:
                   zorder = 0.001, color='#1f6f9c', alpha = 0.3,
                   scalex = False, scaley = False)
         # plot the boundary
-        blue_sort = blue_grid[np.argsort(-blue_grid[:, 1])]
-        _, idx = np.unique(blue_sort[:, 0], return_index=True)
-        boundary = blue_sort[idx]
-        axes.plot(boundary[:, 0], boundary[:, 1], 'k-')
+        if boundary_line:
+            blue_sort = blue_grid[np.argsort(-blue_grid[:, 1])]
+            _, idx = np.unique(blue_sort[:, 0], return_index=True)
+            boundary = blue_sort[idx]
+            axes.plot(boundary[:, 0], boundary[:, 1], 'k-')
+        axes.set_title(f"{k}-Nearest Neighbor Classifier")
         
 
 
