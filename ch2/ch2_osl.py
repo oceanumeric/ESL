@@ -146,16 +146,29 @@ class OverviewSL:
                         color='#1f6f9c', facecolor='none', s=70)
         xlim = axes.get_xlim()
         ylim = axes.get_ylim()
+        # shape = 2500 x 2
         grid = np.array([*product(np.linspace(*xlim, 50),
                                   np.linspace(*ylim, 50))])
         # np.random.multivariate_normal([0, 1], cov, 10)
         # mean = a vector [1.11742176 2.0701749 ]
+        # p(x|orange) calculated by simulated model
+        # in practce we estimate it by using taining data
         orange_pdf = np.mean([
             multivariate_normal.pdf(grid, mean=m, cov=np.eye(2)/5)
             for m in self.mk_orange_10], axis=0)
+        # shape = 2500 x 1 ; 2500 can be taken as the sample size
         blue_pdf = np.mean([
             multivariate_normal.pdf(grid, mean=m, cov=np.eye(2)/5)
             for m in self.mk_blue_10], axis=0)
+        orange_grid = grid[orange_pdf >= blue_pdf]
+        blue_grid = grid[orange_pdf < blue_pdf]
+        axes.plot(orange_grid[:, 0], orange_grid[:, 1], '.',
+                  zorder = 0.001, color='#d68904', alpha = 0.3,
+                  scalex = False, scaley = False)
+        axes.plot(blue_grid[:, 0], blue_grid[:, 1], '.',
+                  zorder = 0.001, color='#1f6f9c', alpha = 0.3,
+                  scalex = False, scaley = False)
+        axes.set_title(r"Bayes Optimal Classifier $\mathbb{P}(orange) = \mathbb{P}(blue) = 1/2$")
         
         
         
