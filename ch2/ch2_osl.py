@@ -1,11 +1,13 @@
 """
 Chapter 2: overview of supervised learning
 """
+import random 
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from itertools import filterfalse, product
-import random 
+from scipy.stats import multivariate_normal
+
 
 
 class OverviewSL:
@@ -19,10 +21,10 @@ class OverviewSL:
     # generate data as class variables
     size = 100
     cov = np.identity(2)
-    mk_orange = np.random.multivariate_normal([0, 1], cov, 10)
-    mk_orange = random.choice(mk_orange)
-    mk_blue = np.random.multivariate_normal([1, 0], cov, 10)
-    mk_blue = random.choice(mk_blue)
+    mk_orange_10 = np.random.multivariate_normal([0, 1], cov, 10)
+    mk_orange = random.choice(mk_orange_10)
+    mk_blue_10 = np.random.multivariate_normal([1, 0], cov, 10)
+    mk_blue = random.choice(mk_blue_10)
     orange = []
     blue = []
     for i in range(size):
@@ -133,6 +135,29 @@ class OverviewSL:
             boundary = blue_sort[idx]
             axes.plot(boundary[:, 0], boundary[:, 1], 'k-')
         axes.set_title(f"{k}-Nearest Neighbor Classifier")
+        
+        
+    def bayes_classifier(self):
+        # plot the classification 
+        fig, axes = plt.subplots(1, 1, figsize=(8, 8))
+        axes.scatter(self.orange[:, 0], self.orange[:, 1],
+                        color='#d68904', facecolor='none', s=70)
+        axes.scatter(self.blue[:, 0], self.blue[:, 1],
+                        color='#1f6f9c', facecolor='none', s=70)
+        xlim = axes.get_xlim()
+        ylim = axes.get_ylim()
+        grid = np.array([*product(np.linspace(*xlim, 50),
+                                  np.linspace(*ylim, 50))])
+        # np.random.multivariate_normal([0, 1], cov, 10)
+        # mean = a vector [1.11742176 2.0701749 ]
+        orange_pdf = np.mean([
+            multivariate_normal.pdf(grid, mean=m, cov=np.eye(2)/5)
+            for m in self.mk_orange_10], axis=0)
+        blue_pdf = np.mean([
+            multivariate_normal.pdf(grid, mean=m, cov=np.eye(2)/5)
+            for m in self.mk_blue_10], axis=0)
+        
+        
         
 
 
