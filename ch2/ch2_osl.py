@@ -310,6 +310,31 @@ class OverviewSL:
         axes[1].set_title("1-NN in One vs. Two Dimensions")
         axes[1].set_xlabel("x1")
         axes[1].set_ylabel("x2")
+        
+    def plot_simulated_data_2_7_2(self):
+        
+        def _generate_training_data(p, n):
+            """
+            p - dimension
+            n - sample size 
+            """
+            X = np.array(
+                [np.random.uniform(-1, 1, p)
+                 for _ in range(n)]
+            )
+            Y = np.apply_along_axis(np.linalg.norm, 1, X).reshape(-1, 1)
+            Y = np.exp(-8*np.power(Y, 2))
+            return X, Y 
+        
+        # calculate the mean square error with sample size n = 100
+        # and p in [1, 2]
+        p_list = list(range(1, 11))
+        mse = []
+        variance = []
+        bias = []
+        for p in p_list:
+            x, y = _generate_training_data(p, 100)
+            x_norm = np.linalg.norm(x)
             
             
             
