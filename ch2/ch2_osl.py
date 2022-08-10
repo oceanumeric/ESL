@@ -228,6 +228,40 @@ class OverviewSL:
                         facecolor='none', edgecolor='b')
         ax.set_title('The share of unit cube is 4% (it covers 4 points)')
 
+    def plot_dimension_curse(self):
+        def _edge_fraction(r, p):
+            return np.power(r, 1/p)
+        
+        fig = plt.figure(figsize=(12, 7))
+        ax = fig.add_subplot(121, projection='3d')
+        r = [0, 5]
+        for s, e in combinations(np.array(list(product(r,r,r))), 2):
+            if np.sum(np.abs(s-e)) == r[1]-r[0]:
+                ax.plot3D(*zip(s,e), color="grey")
+        c = [0, 1]
+        for s, e in combinations(np.array(list(product(c,c,c))), 2):
+            if np.sum(np.abs(s-e)) == c[1]-c[0]:
+                ax.plot3D(*zip(s,e), color="#d68904")
+        ax.grid(False)
+        ax.view_init(17)
+        ax.set_title('The share of unit cube is 0.8%')
+        ax = fig.add_subplot(122)
+        ax.set_xlim(0, 0.8)
+        ax.set_ylim(0, 1)
+        fraction = np.linspace(0, 0.8, 100)
+        for i in [1, 2, 3, 10]:
+            ax.plot(fraction, _edge_fraction(fraction, i),
+            label=f'p={i}')
+        ax.legend(loc='lower right')
+        ax.axvline(x=0.3, ls=':', color='k')
+        ax.set_aspect(0.8, adjustable='box')
+        ax.set_xlabel('fraction of data')
+        ax.set_ylabel('distance of edge')
+        ax.set_title('The curse of dimensionality')
+ 
+
+        
+
 
 
         
