@@ -312,10 +312,14 @@ class OverviewSL:
         axes[1].set_ylabel("x2")
         
     def plot_simulated_data_2_7_2(self):
+        """
+        we are estimation f(0), therefore the nearest
+        point should have the smallest L2-norm
+        """
         
-        def _generate_training_data(p, n):
+        def _generate_training_data(p :int, n :int) -> np.ndarray:
             """
-            p - dimension
+            p - dimension \\
             n - sample size 
             """
             X = np.array(
@@ -326,15 +330,59 @@ class OverviewSL:
             Y = np.exp(-8*np.power(Y, 2))
             return X, Y 
         
-        # calculate the mean square error with sample size n = 100
-        # and p in [1, 2]
-        p_list = list(range(1, 11))
-        mse = []
-        variance = []
-        bias = []
-        for p in p_list:
-            x, y = _generate_training_data(p, 100)
-            x_norm = np.linalg.norm(x)
+        def _simulation(p :int, n :int, nsim :int) -> dict:
+            res = {'average_distance': 0}
+            estimated_y_nsim = []
+            distance_nsim = []
+            for _ in range(nsim):
+                x, y = _generate_training_data(p, n)
+                # find the nearest point at [0] or [0, 0, ..,0]
+                if p == 1:
+                    x_norm = np.abs(x)
+                else:
+                    # 1000 times p, calculate norm arlong axis = 1
+                    x_norm = np.linalg.norm(x, axis=1)
+                nearest_idx = x_norm.argmin()
+                nearest_x, nearest_distance = x[nearest_idx], x_norm[nearest_idx]
+                # estimated y conditional x
+                nearest_y = np.exp(-8*np.power(np.linalg.norm(nearest_x), 2))
+                estimated_y_nsim.append(nearest_y)
+                distance_nsim.append(nearest_distance)
+            res['average_distance'] = np.mean(distance_nsim)
+            estimated_y_nsim = np.array(estimated_y_nsim)
+            res['variance'] = estimated_y_nsim.var()
+            # calculate bias f(0) = 1 bias = 1 - nearest_y
+            res['squared_bias'] = np.mean((1-estimated_y_nsim)*(1-estimated_y_nsim))
+            
+            return res
+        
+        # plot the graph
+        nsim = 100
+        data = {p: _simulation(p, 1000, nsim) for p in range(1, 11)}
+        dimension = list(data.keys())
+        average_distance = [d['average_distance'] for p, d in data.items()]
+        variance = np.array([d['variance'] for p, d in data.items()])
+        squared_bias = np.array([d['squared_bias'] for p, d in data.items()])
+        mse = variance + squared_bias
+        
+        fig, axes = plt.subplots(1, 2, figsize=(12, 7))
+
+        fig2 = plt.figure(2, figsize=(10, 5))
+        ax21 = fig2.add_subplot(1, 2, 1)
+        ax21.set_title('Distance to 1-NN vs. Dimension')
+        ax21.plot(dimension, average_distance, 'ro--')
+        ax21.set_xlabel('Dimension')
+        ax21.set_ylabel('Average Distance to Nearest Neighbor')
+
+        ax22 = fig2.add_subplot(1, 2, 2)
+        ax22.set_title('MSE vs. Dimension')
+        ax22.plot(dimension, mse, 'o-', label='MSE')
+        ax22.plot(dimension, variance, 'o-', label='Variance')
+        ax22.plot(dimension, squared_bias, 'o-', label='Squared Bias')
+        ax22.set_xlabel('Dimension')
+        ax22.set_ylabel('MSE')
+        ax22.legend()
+
             
             
             
