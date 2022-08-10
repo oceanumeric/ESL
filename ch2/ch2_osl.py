@@ -51,7 +51,7 @@ class OverviewSL:
         '''
         plot the simulated data
         '''
-        fig, axes = plt.subplots(1, 1, figsize=(8, 8))
+        fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(cls.orange[:, 0], cls.orange[:, 1],
                         color='#d68904', facecolor='none', s=70)
         axes.scatter(cls.blue[:, 0], cls.blue[:, 1],
@@ -72,7 +72,7 @@ class OverviewSL:
         Plot the linear model 
         '''
         is_orange = lambda x: np.dot(np.r_[1, x], self.weights) > 0.5  # create a filter
-        fig, axes = plt.subplots(1, 1, figsize=(8, 8))
+        fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(self.orange[:, 0], self.orange[:, 1],
                         color='#d68904', facecolor='none', s=70)
         axes.scatter(self.blue[:, 0], self.blue[:, 1],
@@ -114,11 +114,11 @@ class OverviewSL:
         is_orange = lambda x: __predict(x) > 0.5
         
         # plot the classification 
-        fig, axes = plt.subplots(1, 1, figsize=(8, 8))
+        fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(self.orange[:, 0], self.orange[:, 1],
-                        color='#d68904', facecolor='none', s=70)
+                        color='#d68904', facecolor='none', s=60)
         axes.scatter(self.blue[:, 0], self.blue[:, 1],
-                        color='#1f6f9c', facecolor='none', s=70)
+                        color='#1f6f9c', facecolor='none', s=60)
         xlim = axes.get_xlim()
         ylim = axes.get_ylim()
         grid = np.array([*product(np.linspace(*xlim, 50),
@@ -142,11 +142,11 @@ class OverviewSL:
         
     def bayes_classifier(self):
         # plot the classification 
-        fig, axes = plt.subplots(1, 1, figsize=(8, 8))
+        fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(self.orange[:, 0], self.orange[:, 1],
-                        color='#d68904', facecolor='none', s=70)
+                        color='#d68904', facecolor='none', s=60)
         axes.scatter(self.blue[:, 0], self.blue[:, 1],
-                        color='#1f6f9c', facecolor='none', s=70)
+                        color='#1f6f9c', facecolor='none', s=60)
         xlim = axes.get_xlim()
         ylim = axes.get_ylim()
         # shape = 2500 x 2
@@ -180,7 +180,7 @@ class OverviewSL:
         self.one_dim = np.random.normal(mu, sigma, 100)
         self.two_dim = np.random.multivariate_normal([0, 0],
                                                      np.identity(2)*sigma, 100)
-        fig, axes = plt.subplots(1, 2, figsize=(12, 7))
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
         axes[0].scatter(self.one_dim, [0]*self.one_dim.shape[0],
                         facecolor='none', edgecolor='r')
         axes[0].set_title("One dimension: not much sparsity")
@@ -192,7 +192,7 @@ class OverviewSL:
     def plot_denstity_example(self):
         x = np.linspace(0, 1, 5)
         xx = np.array([*product(x, x)])
-        fig, axes = plt.subplots(1, 2, figsize=(12, 7))
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
         axes[0].plot(x, [0]*x.shape[0], 'or-')
         axes[0].set_title("Sampling of density 5 in one dimension")
         axes[0].set_aspect('equal', adjustable='box')
@@ -204,7 +204,7 @@ class OverviewSL:
         axes[1].set_aspect('equal', adjustable='box')
 
     def plot_cube(self):
-        fig = plt.figure(figsize=(12, 7))
+        fig = plt.figure(figsize=(10, 5))
         ax = fig.add_subplot(121, projection='3d')
         r = [0, 5]
         for s, e in combinations(np.array(list(product(r,r,r))), 2):
@@ -235,7 +235,7 @@ class OverviewSL:
         def _edge_fraction(r, p):
             return np.power(r, 1/p)
         
-        fig = plt.figure(figsize=(12, 7))
+        fig = plt.figure(figsize=(10, 5))
         ax = fig.add_subplot(121, projection='3d')
         r = [0, 5]
         for s, e in combinations(np.array(list(product(r,r,r))), 2):
@@ -279,7 +279,7 @@ class OverviewSL:
         
         X, Y = _generate_training_data(1, 30) 
         # plot the function in one dimension
-        fig, axes = plt.subplots(1, 2, figsize=(12, 7))
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
         x = np.linspace(-1, 1, 1000)
         axes[0].plot(x, np.exp(-8*np.power(x, 2)), color='g')
         axes[0].scatter(X, Y, color='#1FBFC3')
@@ -287,14 +287,14 @@ class OverviewSL:
         axes[0].axvline(x=0.11, color='k', ls=":", ymax=0.87)
         axes[0].annotate("the nearest neighbor",
                          xy=(0.13, 0.93),)
-        axes[0].annotate("is very close to 0", xy=(0.16, 0.89))
+        axes[0].annotate("is very close to 0", xy=(0.16, 0.85))
         ticks = [-1, -0.5, 0, 0.5, 1]
         axes[0].set_xticks(ticks)
         for xx in X:
             axes[0].axvline(xx, ymax=0.03, color='grey')
         axes[0].set_title("1-NN in One Dimension")
         axes[0].annotate(r"$f(x) = e^{-8||x||^2}$",
-                         xy=(-0.95, 0.8), fontsize=16)
+                         xy=(-1, 0.85), fontsize=14)
         axes[0].set_aspect(2)
         axes[0].set_xlabel("x")
         # plot 2 dimension
@@ -351,7 +351,7 @@ class OverviewSL:
             res['average_distance'] = np.mean(distance_nsim)
             estimated_y_nsim = np.array(estimated_y_nsim)
             res['variance'] = estimated_y_nsim.var()
-            # calculate bias f(0) = 1 bias = 1 - nearest_y
+            # calculate bias f(0) = 1; bias = 1 - nearest_y
             res['squared_bias'] = np.mean((1-estimated_y_nsim)*(1-estimated_y_nsim))
             
             return res
@@ -365,23 +365,19 @@ class OverviewSL:
         squared_bias = np.array([d['squared_bias'] for p, d in data.items()])
         mse = variance + squared_bias
         
-        fig, axes = plt.subplots(1, 2, figsize=(12, 7))
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        axes[0].set_title('Distance to 1-NN vs. Dimension')
+        axes[0].plot(dimension, average_distance, 'ro--')
+        axes[0].set_xlabel('Dimension')
+        axes[0].set_ylabel('Average Distance to Nearest Neighbor')
 
-        fig2 = plt.figure(2, figsize=(10, 5))
-        ax21 = fig2.add_subplot(1, 2, 1)
-        ax21.set_title('Distance to 1-NN vs. Dimension')
-        ax21.plot(dimension, average_distance, 'ro--')
-        ax21.set_xlabel('Dimension')
-        ax21.set_ylabel('Average Distance to Nearest Neighbor')
-
-        ax22 = fig2.add_subplot(1, 2, 2)
-        ax22.set_title('MSE vs. Dimension')
-        ax22.plot(dimension, mse, 'o-', label='MSE')
-        ax22.plot(dimension, variance, 'o-', label='Variance')
-        ax22.plot(dimension, squared_bias, 'o-', label='Squared Bias')
-        ax22.set_xlabel('Dimension')
-        ax22.set_ylabel('MSE')
-        ax22.legend()
+        axes[1].set_title('MSE vs. Dimension')
+        axes[1].plot(dimension, mse, 'o-', label='MSE')
+        axes[1].plot(dimension, variance, 'o-', label='Variance')
+        axes[1].plot(dimension, squared_bias, 'o-', label='Squared Bias')
+        axes[1].set_xlabel('Dimension')
+        axes[1].set_ylabel('MSE')
+        axes[1].legend()
 
             
             
