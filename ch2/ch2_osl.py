@@ -261,6 +261,48 @@ class OverviewSL:
         ax.set_xlabel('fraction of data')
         ax.set_ylabel('distance of edge')
         ax.set_title('The curse of dimensionality')
+        
+    def plot_simulated_data_2_7_1(self):
+        
+        def _generate_training_data(p, n):
+            """
+            p - dimension
+            n - sample size 
+            """
+            X = np.array(
+                [np.random.uniform(-1, 1, p)
+                 for _ in range(n)]
+            )
+            Y = np.apply_along_axis(np.linalg.norm, 1, X).reshape(-1, 1)
+            Y = np.exp(-8*np.power(Y, 2))
+            return X, Y 
+        
+        X, Y = _generate_training_data(1, 30) 
+        # plot the function in one dimension
+        fig, axes = plt.subplots(1, 2, figsize=(12, 7))
+        x = np.linspace(-1, 1, 1000)
+        axes[0].plot(x, np.exp(-8*np.power(x, 2)), color='g')
+        axes[0].scatter(X, Y, color='#1FBFC3')
+        axes[0].axvline(x=0, color='k')
+        axes[0].axvline(x=0.11, color='k', ls=":", ymax=0.87)
+        axes[0].annotate("the nearest neighbor",
+                         xy=(0.13, 0.93),)
+        axes[0].annotate("is very close to 0", xy=(0.16, 0.89))
+        axes[0].set_xticks([-1, -0.5, 0, 0.5, 1])
+        for xx in X:
+            axes[0].axvline(xx, ymax=0.03, color='grey')
+        axes[0].set_title("1-NN in One Dimension")
+        axes[0].annotate(r"$f(x) = e^{-8||x||^2}$",
+                         xy=(-0.95, 0.8), fontsize=16)
+        axes[0].set_aspect(1.8)
+        axes[0].set_xlabel("x")
+        im = plt.imread("./images/cursedim2.png")
+        axes[1].imshow(im)
+        axes[1].axis('off')
+        axes[1].set_title("1-NN in One vs. Two Dimensions")
+            
+            
+            
  
 
         
