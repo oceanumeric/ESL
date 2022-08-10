@@ -187,6 +187,7 @@ class OverviewSL:
         axes[1].scatter(self.two_dim[:, 0], self.two_dim[:, 1],
                         facecolor='none', edgecolor='g')
         axes[1].set_title("Two dimension: some sparsity")
+        axes[1].set_aspect('equal', adjustable='box')
 
     def plot_denstity_example(self):
         x = np.linspace(0, 1, 5)
@@ -194,11 +195,13 @@ class OverviewSL:
         fig, axes = plt.subplots(1, 2, figsize=(12, 7))
         axes[0].plot(x, [0]*x.shape[0], 'or-')
         axes[0].set_title("Sampling of density 5 in one dimension")
+        axes[0].set_aspect('equal', adjustable='box')
         axes[0].axis('off')
         axes[1].scatter(xx[:,0], xx[:, 1],
                         facecolor='g', edgecolor='g')
         axes[1].set_title("Sampling of density 5 in"\
                         "two dimension (more points are needed")
+        axes[1].set_aspect('equal', adjustable='box')
 
     def plot_cube(self):
         fig = plt.figure(figsize=(12, 7))
