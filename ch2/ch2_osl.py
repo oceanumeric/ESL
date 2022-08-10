@@ -53,9 +53,9 @@ class OverviewSL:
         '''
         fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(cls.orange[:, 0], cls.orange[:, 1],
-                        color='#d68904', facecolor='none', s=70)
+                        color='#d68904', facecolor='none', s=55)
         axes.scatter(cls.blue[:, 0], cls.blue[:, 1],
-                        color='#1f6f9c', facecolor='none', s=70)
+                        color='#1f6f9c', facecolor='none', s=55)
         fig.show()
 
     def fit_with_linear_model(self):
@@ -74,9 +74,9 @@ class OverviewSL:
         is_orange = lambda x: np.dot(np.r_[1, x], self.weights) > 0.5  # create a filter
         fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(self.orange[:, 0], self.orange[:, 1],
-                        color='#d68904', facecolor='none', s=70)
+                        color='#d68904', facecolor='none', s=55)
         axes.scatter(self.blue[:, 0], self.blue[:, 1],
-                        color='#1f6f9c', facecolor='none', s=70)
+                        color='#1f6f9c', facecolor='none', s=55)
         xlim = axes.get_xlim()
         ylim = axes.get_ylim()
         # * unpact sequences or iterators 
@@ -116,9 +116,9 @@ class OverviewSL:
         # plot the classification 
         fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(self.orange[:, 0], self.orange[:, 1],
-                        color='#d68904', facecolor='none', s=60)
+                        color='#d68904', facecolor='none', s=55)
         axes.scatter(self.blue[:, 0], self.blue[:, 1],
-                        color='#1f6f9c', facecolor='none', s=60)
+                        color='#1f6f9c', facecolor='none', s=55)
         xlim = axes.get_xlim()
         ylim = axes.get_ylim()
         grid = np.array([*product(np.linspace(*xlim, 50),
@@ -144,9 +144,9 @@ class OverviewSL:
         # plot the classification 
         fig, axes = plt.subplots(1, 1, figsize=(5, 5))
         axes.scatter(self.orange[:, 0], self.orange[:, 1],
-                        color='#d68904', facecolor='none', s=60)
+                        color='#d68904', facecolor='none', s=55)
         axes.scatter(self.blue[:, 0], self.blue[:, 1],
-                        color='#1f6f9c', facecolor='none', s=60)
+                        color='#1f6f9c', facecolor='none', s=55)
         xlim = axes.get_xlim()
         ylim = axes.get_ylim()
         # shape = 2500 x 2
