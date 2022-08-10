@@ -288,18 +288,28 @@ class OverviewSL:
         axes[0].annotate("the nearest neighbor",
                          xy=(0.13, 0.93),)
         axes[0].annotate("is very close to 0", xy=(0.16, 0.89))
-        axes[0].set_xticks([-1, -0.5, 0, 0.5, 1])
+        ticks = [-1, -0.5, 0, 0.5, 1]
+        axes[0].set_xticks(ticks)
         for xx in X:
             axes[0].axvline(xx, ymax=0.03, color='grey')
         axes[0].set_title("1-NN in One Dimension")
         axes[0].annotate(r"$f(x) = e^{-8||x||^2}$",
                          xy=(-0.95, 0.8), fontsize=16)
-        axes[0].set_aspect(1.8)
+        axes[0].set_aspect(2)
         axes[0].set_xlabel("x")
-        im = plt.imread("./images/cursedim2.png")
-        axes[1].imshow(im)
-        axes[1].axis('off')
+        # plot 2 dimension
+        x2, y = _generate_training_data(2, 30)
+        axes[1].scatter(x2[:, 0], x2[:, 1], color='#1FBFC3')
+        axes[1].set_aspect(0.9)
+        axes[1].set_xticks(ticks)
+        axes[1].set_yticks(ticks)
+        axes[1].axvspan(-0.05, 0.05, alpha=0.3, color='#F8A331')
+        axes[1].scatter(0, 0, color='k', s=15)
+        circle = plt.Circle((0, 0), 0.12, color='b', alpha=0.2)
+        axes[1].add_patch(circle)
         axes[1].set_title("1-NN in One vs. Two Dimensions")
+        axes[1].set_xlabel("x1")
+        axes[1].set_ylabel("x2")
             
             
             
