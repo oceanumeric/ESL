@@ -310,12 +310,9 @@ class OverviewSL:
         axes[1].set_title("1-NN in One vs. Two Dimensions")
         axes[1].set_xlabel("x1")
         axes[1].set_ylabel("x2")
-        
-    def plot_simulated_data_2_7_2(self):
-        """
-        we are estimation f(0), therefore the nearest
-        point should have the smallest L2-norm
-        """
+    
+    @classmethod    
+    def __simulation(cls, p :int, n :int, nsim :int, model :str) -> dict:
         
         def _generate_training_data(p :int, n :int) -> np.ndarray:
             """
@@ -330,35 +327,78 @@ class OverviewSL:
             Y = np.exp(-8*np.power(Y, 2))
             return X, Y 
         
-        def _simulation(p :int, n :int, nsim :int) -> dict:
-            res = {'average_distance': 0}
-            estimated_y_nsim = []
-            distance_nsim = []
-            for _ in range(nsim):
+        def _generate_training_data2(p :int, n :int) -> np.ndarray:
+            """
+            p - dimension \\
+            n - sample size 
+            """
+            X = np.array(
+                [np.random.uniform(-1, 1, p)
+                 for _ in range(n)]
+            )
+            # Y constant in all but one dimension
+            Y = np.ones(X.shape)
+            Y[:, 0] = 1/2 * np.power((X[:, 0]+1.0), 3)
+            return X, Y
+        
+        res = {'average_distance': 0}
+        estimated_y_nsim = []
+        distance_nsim = []
+        for _ in range(nsim):
+            if model == "1":
                 x, y = _generate_training_data(p, n)
-                # find the nearest point at [0] or [0, 0, ..,0]
-                if p == 1:
-                    x_norm = np.abs(x)
-                else:
-                    # 1000 times p, calculate norm arlong axis = 1
-                    x_norm = np.linalg.norm(x, axis=1)
-                nearest_idx = x_norm.argmin()
-                nearest_x, nearest_distance = x[nearest_idx], x_norm[nearest_idx]
-                # estimated y conditional x
+            else:
+                x, y = _generate_training_data2(p, n)
+            # find the nearest point at [0] or [0, 0, ..,0]
+            if p == 1:
+                x_norm = np.abs(x)
+            else:
+                # 1000 times p, calculate norm arlong axis = 1
+                x_norm = np.linalg.norm(x, axis=1)
+            nearest_idx = x_norm.argmin()
+            nearest_x, nearest_distance = x[nearest_idx], x_norm[nearest_idx]
+            # estimated y conditional x
+            if model == "1":
                 nearest_y = np.exp(-8*np.power(np.linalg.norm(nearest_x), 2))
-                estimated_y_nsim.append(nearest_y)
-                distance_nsim.append(nearest_distance)
-            res['average_distance'] = np.mean(distance_nsim)
-            estimated_y_nsim = np.array(estimated_y_nsim)
+            else:
+                # constant in all but one dimension 
+                nearest_y = np.ones(nearest_x.shape)
+                nearest_y[0] = 1/2 * np.power(nearest_x[0]+1.0, 3)
+            estimated_y_nsim.append(nearest_y)
+            distance_nsim.append(nearest_distance)
+        res['average_distance'] = np.mean(distance_nsim)
+        estimated_y_nsim = np.array(estimated_y_nsim)
+        if model == "1":
             res['variance'] = estimated_y_nsim.var()
+        else:
+            res['variance'] = estimated_y_nsim[:, 0].var()
+        if model == "1":
             # calculate bias f(0) = 1; bias = 1 - nearest_y
-            res['squared_bias'] = np.mean((1-estimated_y_nsim)*(1-estimated_y_nsim))
-            
-            return res
+            res['squared_bias'] = np.mean(np.power((1-estimated_y_nsim),2))
+        else:
+            if p == 1:
+                # calculate the bias f(0) = 1/2(0+1)^3 = 0.5
+                res['squared_bias'] = np.mean(np.power((0.5-estimated_y_nsim), 2))
+            else:
+                # 1 times p dimension
+                y_0 = np.ones((100, p))
+                y_0[:, 0] = 0.5
+                res['squared_bias'] = np.mean(np.power((y_0[0]-estimated_y_nsim[0]), 2))
+                                        
+                
+                
+        
+        return res
+        
+    def plot_simulated_data_2_7_2(self):
+        """
+        we are estimation f(0), therefore the nearest
+        point should have the smallest L2-norm
+        """
         
         # plot the graph
         nsim = 100
-        data = {p: _simulation(p, 1000, nsim) for p in range(1, 11)}
+        data = {p: self.__simulation(p, 1000, nsim, model="1") for p in range(1, 11)}
         dimension = list(data.keys())
         average_distance = [d['average_distance'] for p, d in data.items()]
         variance = np.array([d['variance'] for p, d in data.items()])
@@ -378,6 +418,58 @@ class OverviewSL:
         axes[1].set_xlabel('Dimension')
         axes[1].set_ylabel('MSE')
         axes[1].legend()
+        
+    def plot_simulated_data_2_8(self):
+        
+        def _generate_training_data(p :int, n :int) -> np.ndarray:
+            """
+            p - dimension \\
+            n - sample size 
+            """
+            X = np.array(
+                [np.random.uniform(-1, 1, p)
+                 for _ in range(n)]
+            )
+            Y = 1/2 * np.power((X[:, 0]+1.0), 3)
+            return X, Y 
+        
+        X, Y = _generate_training_data(1, 30) 
+        # plot the function in one dimension
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        x = np.linspace(-1, 1, 1000)
+        axes[0].plot(x, 1/2 * np.power((x+1.0), 3), color='b')
+        axes[0].scatter(X, Y, color='#1FBFC3')
+        axes[0].axvline(x=0, color='k')
+        axes[0].axvline(x=0.05, color='k', ls=":", ymax=0.2)
+        axes[0].annotate("the nearest neighbor",
+                         xy=(0.13, 0.83),)
+        axes[0].annotate("is very close to 0", xy=(0.16, 0.65))
+        ticks = [-1, -0.5, 0, 0.5, 1]
+        axes[0].set_xticks(ticks)
+        for xx in X:
+            axes[0].axvline(xx, ymax=0.03, color='grey')
+        axes[0].set_title("1-NN in One Dimension")
+        axes[0].annotate(r"$f(X) = \frac{1}{2}(X_1 + 1)^3$",
+                         xy=(-1, 3.0), fontsize=14)
+        axes[0].set_xlabel("x")
+        
+        # plot the mean squared error
+        nsim = 100
+        data = {p: self.__simulation(p, 1000, nsim, model="2") for p in range(1, 11)}
+        dimension = list(data.keys())
+        average_distance = [d['average_distance'] for p, d in data.items()]
+        variance = np.array([d['variance'] for p, d in data.items()])
+        squared_bias = np.array([d['squared_bias'] for p, d in data.items()])
+        mse = variance + squared_bias
+        
+        axes[1].set_title('MSE vs. Dimension')
+        axes[1].plot(dimension, mse, 'o-', label='MSE')
+        axes[1].plot(dimension, variance, 'o-', label='Variance')
+        axes[1].plot(dimension, squared_bias, 'o-', label='Squared Bias')
+        axes[1].set_xlabel('Dimension')
+        axes[1].set_ylabel('MSE')
+        axes[1].legend()
+        
 
             
             
