@@ -10,6 +10,7 @@ from itertools import filterfalse, product, combinations
 from scipy.stats import multivariate_normal
 from matplotlib.patches import Rectangle, Circle, PathPatch
 import mpl_toolkits.mplot3d.art3d as art3d
+from matplotlib.ticker import FormatStrFormatter
 
 
 
@@ -447,7 +448,7 @@ class OverviewSL:
         ticks = [-1, -0.5, 0, 0.5, 1]
         axes[0].set_xticks(ticks)
         for xx in X:
-            axes[0].axvline(xx, ymax=0.03, color='grey')
+            axes[0].axvline(xx, ymax=0.03, color='orange')
         axes[0].set_title("1-NN in One Dimension")
         axes[0].annotate(r"$f(X) = \frac{1}{2}(X_1 + 1)^3$",
                          xy=(-1, 3.0), fontsize=14)
@@ -469,6 +470,11 @@ class OverviewSL:
         axes[1].set_xlabel('Dimension')
         axes[1].set_ylabel('MSE')
         axes[1].legend()
+        ticks = [2, 4, 6, 8, 10]
+        for xticks in ticks:
+            axes[1].axvline(xticks, ymax=0.02, color='grey')
+        axes[1].yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        plt.subplots_adjust(wspace=0.3)
         
 
             
