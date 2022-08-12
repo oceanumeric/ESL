@@ -231,6 +231,42 @@ class OverviewSL:
         ax.scatter(xx[:,0], xx[:, 1],
                         facecolor='none', edgecolor='b')
         ax.set_title('The share of unit cube is 4% (it covers 4 points)')
+        
+    def plot_cube_neighbors(self):
+        def __drawCube(ax, center, color):
+            length = 1
+            width = 1
+            height = 1
+            X, Y, Z = self.__cuboid_data(center, (length, width, height))
+            ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.5, color=color)
+            
+        fig = plt.figure(figsize=(10, 5))
+        ax = fig.add_subplot(121, projection='3d')
+        r = [0, 5]
+        for s, e in combinations(np.array(list(product(r,r,r))), 2):
+            if np.sum(np.abs(s-e)) == r[1]-r[0]:
+                ax.plot3D(*zip(s,e), color="k")
+        c = [0, 1]
+        for s, e in combinations(np.array(list(product(c,c,c))), 2):
+            if np.sum(np.abs(s-e)) == c[1]-c[0]:
+                ax.plot3D(*zip(s,e), color="r")
+        __drawCube(ax, [0.5, 0.5, 1.5], color='#18A75A')
+        ax.grid(False)
+        ax.view_init(17)
+        ax.set_title('The share of unit cube is 0.8%')
+        ax = fig.add_subplot(122)
+        x = np.linspace(0, 1, 5)
+        ax.set_xlim(0, 5)
+        ax.set_ylim(0, 5)
+        ax.set_aspect('equal', adjustable='box')
+        ax.plot(x, [0]*x.shape[0], 'k')
+        ax.plot(x, [1]*x.shape[0], 'k')
+        ax.plot([1]*x.shape[0], x, 'k')
+        x = np.linspace(0, 5, 10)
+        xx = np.array([*product(x, x)])
+        ax.scatter(xx[:,0], xx[:, 1],
+                        facecolor='none', edgecolor='b')
+        ax.set_title('The share of unit cube is 4% (it covers 4 points)')
 
     def plot_dimension_curse(self):
         def _edge_fraction(r, p):
@@ -475,6 +511,40 @@ class OverviewSL:
             axes[1].axvline(xticks, ymax=0.02, color='grey')
         axes[1].yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
         plt.subplots_adjust(wspace=0.3)
+        
+    @classmethod
+    def __cuboid_data(cls, center, size):
+        """
+        Create a data array for cuboid plotting.
+
+        ============= ================================================
+        Argument      Description
+        ============= ================================================
+        center        center of the cuboid, triple
+        size          size of the cuboid, triple, (x_length,y_width,z_height)
+        :type size: tuple, numpy.array, list
+        :param size: size of the cuboid, triple, (x_length,y_width,z_height)
+        :type center: tuple, numpy.array, list
+        :param center: center of the cuboid, triple, (x,y,z)
+        """
+        # suppose axis direction: x: to left; y: to inside; z: to upper
+        # get the (left, outside, bottom) point
+        o = [a - b / 2 for a, b in zip(center, size)]
+        # get the length, width, and height
+        l, w, h = size
+        x = [[o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in bottom surface
+            [o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in upper surface
+            [o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in outside surface
+            [o[0], o[0] + l, o[0] + l, o[0], o[0]]]  # x coordinate of points in inside surface
+        y = [[o[1], o[1], o[1] + w, o[1] + w, o[1]],  # y coordinate of points in bottom surface
+            [o[1], o[1], o[1] + w, o[1] + w, o[1]],  # y coordinate of points in upper surface
+            [o[1], o[1], o[1], o[1], o[1]],          # y coordinate of points in outside surface
+            [o[1] + w, o[1] + w, o[1] + w, o[1] + w, o[1] + w]]    # y coordinate of points in inside surface
+        z = [[o[2], o[2], o[2], o[2], o[2]],                        # z coordinate of points in bottom surface
+            [o[2] + h, o[2] + h, o[2] + h, o[2] + h, o[2] + h],    # z coordinate of points in upper surface
+            [o[2], o[2], o[2] + h, o[2] + h, o[2]],                # z coordinate of points in outside surface
+            [o[2], o[2], o[2] + h, o[2] + h, o[2]]]                # z coordinate of points in inside surface
+        return np.array(x), np.array(y), np.array(z)
         
 
             
