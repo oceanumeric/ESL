@@ -251,6 +251,9 @@ class OverviewSL:
             if np.sum(np.abs(s-e)) == c[1]-c[0]:
                 ax.plot3D(*zip(s,e), color="r")
         __drawCube(ax, [0.5, 0.5, 1.5], color='#18A75A')
+        __drawCube(ax, [1.5, 1.5, 1.5], color='#18A75A')
+        __drawCube(ax, [1.5, 0.5, 0.5], color='#18A75A')
+        __drawCube(ax, [0.5, 1.5, 0.5], color='#18A75A')
         ax.grid(False)
         ax.view_init(17)
         ax.set_title('The share of unit cube is 0.8%')
