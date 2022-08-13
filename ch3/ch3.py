@@ -98,7 +98,7 @@ class LinearRegression:
         fig, ax = plt.subplots(1, 1, figsize=(7, 5))
         res = [(res['k'], res['rss']) for res in self.subsets_ols]
         res = np.array(res)
-        ax.scatter(res[:, 0], res[:, 1], color='grey', s=5)
+        ax.scatter(res[:, 0], res[:, 1], color='grey', s=6)
         ax.set_ylim(0, 100)
         ax.set_xticks(range(9))
         ax.set_xlabel('Subset Size k')
@@ -107,7 +107,7 @@ class LinearRegression:
         res = pd.DataFrame(res)
         res.columns = ['k', 'value']
         ll = res.groupby('k')['value'].min()
-        ax.plot(ll, 'o-', color='#FC0D1B', markersize=5)
+        ax.plot(ll, 'o--', color='#FC0D1B', markersize=4)
         
         
             
