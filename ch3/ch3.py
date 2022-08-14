@@ -2,6 +2,7 @@
 Linear Methods for Regression
 """
 import math
+import time
 import itertools
 import numpy as np
 import scipy as sp
@@ -19,6 +20,7 @@ class LinearRegression:
         self.data = pd.read_csv(url, delimiter="\t").iloc[:, 1:]
         self.feature_idx = self.data.columns[:-2]  # feature names index 
         self.y = self.data['lpsa']
+        self.selection_performance = {}
         
         
     def normalize_dataset(self) -> None:
@@ -37,6 +39,16 @@ class LinearRegression:
         
     @classmethod
     def fit_with_ols(cls, X :np.ndarray, Y :np.ndarray) -> np.ndarray:
+        """
+        Input:
+            - X 
+            - Y 
+        
+        Return: 
+            - beta
+            - fitted_y
+            - sum_rss
+        """
         # add constant values
         cnst = np.ones((X.shape[0], 1))
         X = np.hstack((cnst, X))
@@ -72,7 +84,7 @@ class LinearRegression:
         res.append(
             {
                 'k': 0,
-                'featuress': 'constant',
+                'features': 'constant',
                 'beta': beta,
                 'rss': rss
             }
@@ -93,7 +105,7 @@ class LinearRegression:
                 )
         
         self.subsets_ols = res
-    
+        
     def plot_figure_3_5(self):
         fig, ax = plt.subplots(1, 1, figsize=(7, 5))
         res = [(res['k'], res['rss']) for res in self.subsets_ols]
@@ -109,6 +121,54 @@ class LinearRegression:
         ll = res.groupby('k')['value'].min()
         ax.plot(ll, 'o--', color='#FC0D1B', markersize=4)
         
+    def find_best_subset(self):
+        """
+        Use brutal force to find the best subset and print out the results
+        """
+        tic = time.time()
+        self.fit_with_subsets()
+        toc = time.time()
+        all_results = pd.DataFrame(self.subsets_ols)
+        print("The brutal force takes", round(toc-tic, 3), "seconds.")
+        return all_results.loc[all_results['rss'].argmin()]
+    
+        
+    def forward_stepwise(self) -> None:
+        """
+        Find the best subset based on finding the minimal Rss \\
+        Use the same training dataset \\
+        Algorithm:
+            - it starts from the subset k = 1 (it assumes rss is bigger when \\
+                k = 0)
+        """
+        # initialize the list, start from the intercept
+        model_info = pd.DataFrame(columns=['features', 'rss'])
+        tic = time.time()
+        subset_list = []
+        for i in range(1, self.x_train.shape[1]+1):
+            remaining_var = [p for p in self.x_train.columns 
+                             if p not in subset_list]
+            results = []
+            for p in remaining_var:
+                forward_features = subset_list + [p]
+                x = self.x_train[forward_features]
+                beta, _, rss = self.fit_with_ols(x, self.y_train)
+                res = {'features': p, 'beta': beta, 'rss': rss}
+                results.append(res)
+            models = pd.DataFrame(results)
+            # find the best one within this selection
+            best_model = models.loc[models['rss'].argmin()]
+            # now append it to model_info
+            model_info.loc[i] = best_model
+            # update the subset_list
+            subset_list.append(model_info.loc[i]['features'])
+        toc = time.time()
+        print("Forward Selection takes:", round(toc-tic, 3), "seconds.")
+        print(subset_list)
+                
+            
+            
+            
         
             
             
