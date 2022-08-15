@@ -133,7 +133,7 @@ class LinearRegression:
         return all_results.loc[all_results['rss'].argmin()]
     
         
-    def forward_stepwise(self) -> None:
+    def forward_stepwise(self, using_test_data=False) -> None:
         """
         Find the best subset based on finding the minimal Rss \\
         Use the same training dataset \\
@@ -154,7 +154,15 @@ class LinearRegression:
                 forward_features = subset_list + [p]
                 x = self.x_train[forward_features]
                 beta, _, rss = self.fit_with_ols(x, self.y_train)
-                res = {'features': p, 'beta': beta, 'rss': rss}
+                if using_test_data:
+                    x = self.x_test[forward_features]
+                    cnst = np.ones((x.shape[0], 1))
+                    x = np.hstack((cnst, x))
+                    fitted_y = x @ beta
+                    rss = np.power(fitted_y - self.y_test, 2).sum()
+                    res = {'features': p, 'beta': beta, 'rss': rss}
+                else:
+                    res = {'features': p, 'beta': beta, 'rss': rss}
                 results.append(res)
             models = pd.DataFrame(results)
             # find the best one within this selection
@@ -165,8 +173,23 @@ class LinearRegression:
             subset_list.append(model_info.loc[i]['features'])
         toc = time.time()
         print("Forward Selection takes:", round(toc-tic, 3), "seconds.")
-        print(model_info)
-        print(subset_list)
+        fig, ax = plt.subplots(1,1, figsize=(7, 5))
+        ax.plot(model_info['features'], model_info['rss'], 'o--',
+                color='#E49E25')
+        ax.set_title("Forward-stepwise selection with the test dataset")
+        ax.set_xlabel("variables")
+        ax.set_ylabel("residual sum of squares (RSS)")
+        for a, b in zip(model_info['features'], model_info['rss']):
+            ax.annotate(f"{b:.3f}", (a, b),
+                        textcoords='offset points',
+                        # text position, lift annotation 
+                        xytext=(0, 7))
+        ax.axvline('gleason', ymax=0.15, color='grey', linestyle=':')
+        ax.axvline('lweight', ymax=0.3, color='grey', linestyle=':')
+        ax.annotate('best subset area', ('gleason', 12.2),
+                    textcoords='offset points',
+                    # text position, move left
+                    xytext=(-2, 0))
                 
             
             
