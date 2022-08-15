@@ -150,6 +150,7 @@ class LinearRegression:
                              if p not in subset_list]
             results = []
             for p in remaining_var:
+                # add new features in the forward manner  
                 forward_features = subset_list + [p]
                 x = self.x_train[forward_features]
                 beta, _, rss = self.fit_with_ols(x, self.y_train)
@@ -164,6 +165,7 @@ class LinearRegression:
             subset_list.append(model_info.loc[i]['features'])
         toc = time.time()
         print("Forward Selection takes:", round(toc-tic, 3), "seconds.")
+        print(model_info)
         print(subset_list)
                 
             
