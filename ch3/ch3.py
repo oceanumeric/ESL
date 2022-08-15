@@ -176,7 +176,6 @@ class LinearRegression:
         fig, ax = plt.subplots(1,1, figsize=(7, 5))
         ax.plot(model_info['features'], model_info['rss'], 'o--',
                 color='#E49E25')
-        ax.set_title("Forward-stepwise selection with the test dataset")
         ax.set_xlabel("variables")
         ax.set_ylabel("residual sum of squares (RSS)")
         for a, b in zip(model_info['features'], model_info['rss']):
@@ -184,12 +183,16 @@ class LinearRegression:
                         textcoords='offset points',
                         # text position, lift annotation 
                         xytext=(0, 7))
-        ax.axvline('gleason', ymax=0.15, color='grey', linestyle=':')
-        ax.axvline('lweight', ymax=0.3, color='grey', linestyle=':')
-        ax.annotate('best subset area', ('gleason', 12.2),
-                    textcoords='offset points',
-                    # text position, move left
-                    xytext=(-2, 0))
+        if using_test_data:
+            ax.set_title("Forward-stepwise selection with the test dataset")
+            ax.axvline('gleason', ymax=0.15, color='grey', linestyle=':')
+            ax.axvline('lweight', ymax=0.3, color='grey', linestyle=':')
+            ax.annotate('best subset area', ('gleason', 12.2),
+                        textcoords='offset points',
+                        # text position, move left
+                        xytext=(-2, 0))
+        else:
+            ax.set_title("Forward-stepwise selection with the training dataset")
                 
             
             
