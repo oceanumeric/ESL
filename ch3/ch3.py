@@ -201,8 +201,80 @@ class SVD:
     """
     A class to illustrate svd decomposition
     """
-    pass 
-                
+    
+    def __init__(self) -> None:
+        self.svd = None
+    
+    @staticmethod
+    def plotVectors(ax, vecs :np.ndarray, cols :np.ndarray, alpha: float=1.0):
+        """
+        Plot set of vectors.
+
+        Parameters
+        ----------
+        ax: axes 
+        vecs : array-like
+            Coordinates of the vectors to plot. Each vectors is in an array. For
+            instance: [[1, 3], [2, 2]] can be used to plot 2 vectors.
+        cols : array-like
+            Colors of the vectors. For instance: ['red', 'blue'] will display the
+            first vector in red and the second in blue.
+        alpha : float
+            Opacity of vectors
+
+        Returns:
+
+        fig : instance of matplotlib.figure.Figure
+            The figure of the vectors
+        """
+        ax.axvline(x=0, color='#A9A9A9', zorder=0)
+        ax.axhline(y=0, color='#A9A9A9', zorder=0)
+
+        for i in range(len(vecs)):
+            x = np.concatenate([[0,0],vecs[i]])
+            ax.quiver([x[0]],
+                    [x[1]],
+                    [x[2]],
+                    [x[3]],
+                    angles='xy', scale_units='xy', scale=1, color=cols[i],
+                    alpha=alpha)
+            
+    @staticmethod
+    def matrixToPlot(ax, matrix, vectorsCol=['#FF9A13', '#1190FF']):
+        """
+        Modify the unit circle and basis vector by applying a matrix.
+        Visualize the effect of the matrix in 2D.
+
+        Parameters
+        ----------
+        matrix : array-like
+            2D matrix to apply to the unit circle.
+        vectorsCol : HEX color code
+            Color of the basis vectors
+
+        Returns:
+
+        fig : instance of matplotlib.figure.Figure
+            The figure containing modified unit circle and basis vectors.
+        """
+        # Unit circle
+        x = np.linspace(-1, 1, 100000)
+        y = np.sqrt(1-(x**2))
+
+        # Modified unit circle (separate negative and positive parts)
+        x1 = matrix[0,0]*x + matrix[0,1]*y
+        y1 = matrix[1,0]*x + matrix[1,1]*y
+        x1_neg = matrix[0,0]*x - matrix[0,1]*y
+        y1_neg = matrix[1,0]*x - matrix[1,1]*y
+
+        # Vectors
+        u1 = [matrix[0,0],matrix[1,0]]
+        v1 = [matrix[0,1],matrix[1,1]]
+
+        SVD.plotVectors(ax, [u1, v1], cols=[vectorsCol[0], vectorsCol[1]])
+
+        ax.plot(x1, y1, '#18A75A', alpha=0.5)
+        ax.plot(x1_neg, y1_neg, '#18A75A', alpha=0.5)
             
             
             
