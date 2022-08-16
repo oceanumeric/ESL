@@ -193,6 +193,15 @@ class LinearRegression:
                         xytext=(-2, 0))
         else:
             ax.set_title("Forward-stepwise selection with the training dataset")
+            
+            
+            
+            
+class SVD:
+    """
+    A class to illustrate svd decomposition
+    """
+    pass 
                 
             
             
