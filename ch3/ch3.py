@@ -4,6 +4,7 @@ Linear Methods for Regression
 import math
 import time
 import itertools
+from turtle import color
 import numpy as np
 import scipy as sp
 import pandas as pd
@@ -223,12 +224,64 @@ class LinearRegression:
         intercept = self.y_train.mean()  # intercept is just mean now 
         # centering y
         y_train_centered = (self.y_train-intercept)
-        print(intercept)
         
         # get sample of train and test dataset
         train_size = self.x_train.shape[0]
         test_size = self.x_test.shape[0]
         var_size = self.x_train.shape[1]
+        
+        def __edf(singular_sigma :np.ndarray, interval :int) -> np.ndarray:
+            """
+            Calculate 
+            """
+            p = singular_sigma.shape[0]
+            edfs = np.linspace(0.5, p-0.5, (p-1)*interval+1)
+            threshold = 1e-3
+            lambdas = []
+            for edf in edfs:
+                # Newton-Raphson
+                lambda0 = (p-edf)/edf
+                lambda1 = 1e6
+                diff = lambda1 - lambda0
+                while diff > threshold:
+                    num = (singular_sigma/(singular_sigma+lambda0)).sum()-edf
+                    denom = (singular_sigma/((singular_sigma+lambda0)**2)).sum()
+                    lambda1 = lambda0 + num/denom
+                    diff = lambda1 - lambda0
+                    lambda0 = lambda1
+                lambdas.append(lambda1)
+            lambdas.append(0)
+            
+            edfs = np.concatenate(([0], edfs, [p]))
+            return edfs, np.array(lambdas)
+        
+        u, s, v = np.linalg.svd(self.x_train, full_matrices=False)
+        s_squared = s**2
+        edfs, lambdas = __edf(s_squared, 10)
+        # initialize the beta_ridge 
+        beta_ridge = [np.zeros(var_size)]
+        for lam in lambdas:
+            Sigma = np.diag(s/(s_squared+lam))
+            # X = U Sigma V^T 
+            beta_estimation = v.T @ Sigma @ u.T @ y_train_centered
+            beta_ridge.append(beta_estimation.flatten())
+        beta_ridge = np.array(beta_ridge)
+        
+        fig, ax = plt.subplots(1, 1, figsize=(6, 8))
+        ax.plot(edfs, beta_ridge, 'o-', markersize=2, color='#0B24FB', alpha=0.7)
+        ax.set_xlabel(r'$df(\lambda)$')
+        ax.set_ylabel("Coefficients")
+        ax.set_title("Profiles of ridge coefficients for the prostate cancer example")
+        ax.axvline(x=5, linestyle='--', color='#FC0D1B', alpha=0.5)
+        ax.axhline(y=0, linestyle='--', color='k', alpha=0.8)
+        # add annotation
+        for idx, v in enumerate(self.x_train.columns):
+            ax.text(8.1, beta_ridge[-1, idx], v, size='small',
+                    horizontalalignment='left')
+        ax.set_xlim(-0.5, 9)
+            
+            
+            
            
     
             
