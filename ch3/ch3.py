@@ -267,7 +267,7 @@ class LinearRegression:
             beta_ridge.append(beta_estimation.flatten())
         beta_ridge = np.array(beta_ridge)
         
-        fig, ax = plt.subplots(1, 1, figsize=(6, 8))
+        fig, ax = plt.subplots(1, 1, figsize=(7, 8))
         ax.plot(edfs, beta_ridge, 'o-', markersize=2, color='#0B24FB', alpha=0.7)
         ax.set_xlabel(r'$df(\lambda)$')
         ax.set_ylabel("Coefficients")
