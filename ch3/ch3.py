@@ -4,6 +4,7 @@ Linear Methods for Regression
 import math
 import time
 import itertools
+import collections
 from turtle import color
 import numpy as np
 import scipy as sp
@@ -217,20 +218,8 @@ class LinearRegression:
             # print(tenfold, original_indices)
         return tenfold_indices 
     
-    def plot_figure_3_8(self):
-        """
-        Plot figure 3.8 
-        """
-        intercept = self.y_train.mean()  # intercept is just mean now 
-        # centering y
-        y_train_centered = (self.y_train-intercept)
-        
-        # get sample of train and test dataset
-        train_size = self.x_train.shape[0]
-        test_size = self.x_test.shape[0]
-        var_size = self.x_train.shape[1]
-        
-        def __edf(singular_sigma :np.ndarray, interval :int) -> np.ndarray:
+    @classmethod
+    def __edf(cls, singular_sigma :np.ndarray, interval :int) -> np.ndarray:
             """
             Calculate 
             """
@@ -254,10 +243,21 @@ class LinearRegression:
             
             edfs = np.concatenate(([0], edfs, [p]))
             return edfs, np.array(lambdas)
+    
+    def plot_figure_3_8(self):
+        """
+        Plot figure 3.8 
+        """
+        intercept = self.y_train.mean()  # intercept is just mean now 
+        # centering y
+        y_train_centered = (self.y_train-intercept)
+        
+        # get sample of train and test dataset
+        var_size = self.x_train.shape[1]
         
         u, s, v = np.linalg.svd(self.x_train, full_matrices=False)
         s_squared = s**2
-        edfs, lambdas = __edf(s_squared, 10)
+        edfs, lambdas = self.__edf(s_squared, 4)
         # initialize the beta_ridge 
         beta_ridge = [np.zeros(var_size)]
         for lam in lambdas:
@@ -279,6 +279,56 @@ class LinearRegression:
             ax.text(8.1, beta_ridge[-1, idx], v, size='small',
                     horizontalalignment='left')
         ax.set_xlim(-0.5, 9)
+        
+    def cross_validation_ridge(self):
+        """
+        10-fold cross validation: use the full dataset 
+        """
+        # centering y 
+        intercept = self.y_train.mean()  # intercept is just mean now 
+        # centering y
+        y_train_centered = (self.y_train-intercept)
+        cv10_indices = LinearRegression.index_tenfold(self.x_train.shape[0])
+        cv_beta = collections.defaultdict(list)
+        cv_rss = collections.defaultdict(list)
+        for cv_idx in range(10):
+            # create a mask 
+            cv_mask = cv10_indices != cv_idx  
+            one_fold_size = (cv_mask == True).size 
+            cv_x = self.x_train[cv_mask]
+            cv_y = y_train_centered[cv_mask]
+            # calculate the intercept
+            intercept = cv_y.mean()
+            rss0 = ((cv_y - intercept)**2).sum()/one_fold_size
+            cv_rss[0].append(rss0)
+            # singular decomposition
+            u, s, vt = np.linalg.svd(cv_x, full_matrices=False)
+            edfs, lambdas = self.__edf(s**2, 2)
+            
+            for edf, lamb in zip(edfs[1:], lambdas):
+                mat_diag = np.diag(s/(s**2+lamb))
+                beta_ridge = vt.T @ mat_diag @ u.T @ cv_y
+                cv_beta[edf].append(beta_ridge)
+                cv_y_fitted = cv_x @ beta_ridge
+                cv_rss[edf].append(((cv_y-cv_y_fitted)**2).sum()/one_fold_size)
+                
+        cv_rss_mean = [np.array(rss).mean() for _, rss in cv_rss.items()]
+        cv_rss_std = [np.array(rss).std() for _, rss in cv_rss.items()]
+    
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+        ax.plot(edfs, cv_rss_mean, 'o-', color='C1')
+        for idx, (ave, std) in enumerate(zip(cv_rss_mean, cv_rss_std)):
+            ax.plot([idx/2, idx/2], [ave-std, ave+std], color='#5BB5E7')
+            ax.plot([idx/2-0.1, idx/2+0.1], [ave-std, ave-std], color='#5BB5E7',
+                    linewidth=1)
+            ax.plot([idx/2-0.1, idx/2+0.1], [ave+std, ave+std], color='#5BB5E7',
+                    linewidth=1)
+        ax.set_xlabel("Degrees of Freedom")
+        ax.set_ylabel("CV Error")
+        ax.axvline(x=5, linestyle='--', alpha=0.5, color='#9F32EC')
+        ax.axhline(cv_rss_mean[10], linestyle='--', alpha=0.5, color='#9F32EC')
+            
+        
             
             
             
