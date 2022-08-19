@@ -327,6 +327,25 @@ class LinearRegression:
         ax.set_ylabel("CV Error")
         ax.axvline(x=5, linestyle='--', alpha=0.5, color='#9F32EC')
         ax.axhline(cv_rss_mean[10], linestyle='--', alpha=0.5, color='#9F32EC')
+    
+        lambda_cv = lambdas[np.where(edfs==5)[0]-1]
+        u, s, vt = np.linalg.svd(cv_x, full_matrices=False)
+        
+        mat_diag = np.diag(s/(s**2+lambda_cv))
+        beta_ridge = vt.T @ mat_diag @ u.T @ cv_y
+        
+        y_test_fitted = self.x_test @ beta_ridge
+        y_test_mena = self.y_test.mean()
+        test_error = ((self.y_test - y_test_mena - y_test_fitted)**2).sum()/self.y_test.shape[0]
+        
+        col1 = []
+        col1.append(round(self.y_train.mean(), 3))
+        col1 += [round(x[0],3) for x in beta_ridge]
+        col1 += [round(list(test_error)[0], 3)]
+        col0 = ['Intercept'] + list(self.feature_idx)+['Test Error']
+        dt = {'variable': col0, 'Value': col1}
+        return pd.DataFrame(dt)
+        
             
         
             
