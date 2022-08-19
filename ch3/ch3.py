@@ -347,16 +347,7 @@ class LinearRegression:
         return pd.DataFrame(dt)
         
             
-        
-            
-            
-            
-           
-    
-            
-            
-            
-            
+
 class SVD:
     """
     A class to illustrate svd decomposition
