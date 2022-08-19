@@ -315,7 +315,7 @@ class LinearRegression:
         cv_rss_mean = [np.array(rss).mean() for _, rss in cv_rss.items()]
         cv_rss_std = [np.array(rss).std() for _, rss in cv_rss.items()]
     
-        fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+        fig, ax = plt.subplots(1, 1, figsize=(6, 5))
         ax.plot(edfs, cv_rss_mean, 'o-', color='C1')
         for idx, (ave, std) in enumerate(zip(cv_rss_mean, cv_rss_std)):
             ax.plot([idx/2, idx/2], [ave-std, ave+std], color='#5BB5E7')
